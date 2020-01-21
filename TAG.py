@@ -143,6 +143,10 @@ class TAG:
         # print("id :", value)
         pass
 
+    def ssh_softwareversion(value):
+        # print("ssh_softwareversion :", value)
+        pass
+
     # def (value):
     #     # print(" :", value)
     #     pass
@@ -219,38 +223,6 @@ class TAG:
     def rawbytes():
         # print("rawbytes")
         pass
-
-    # def ():
-    #     # print("")
-    #     pass
-
-    # def ():
-    #     # print("")
-    #     pass
-
-    # def ():
-    #     # print("")
-    #     pass
-
-    # def ():
-    #     # print("")
-    #     pass
-
-    # def ():
-    #     # print("")
-    #     pass
-
-    # def ():
-    #     # print("")
-    #     pass
-
-    # def ():
-    #     # print("")
-    #     pass
-
-    # def ():
-    #     # print("")
-    #     pass
 
     # def ():
     #     # print("")

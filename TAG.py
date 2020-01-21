@@ -1,3 +1,13 @@
+def findall(str, sub):
+    index = []
+    start = 0
+    while True:
+        start = str.find(sub, start)
+        if start == -1: return index
+        index.append(start - 1)
+        start += len(sub)
+    
+
 class TAG:
     def msg(value):
         # print("msg :", value)
@@ -8,8 +18,23 @@ class TAG:
         pass
 
     def content(value):
-        # print("content :", value)
-        pass
+        delimiter_colon = findall(value, '|')
+        value = value.strip('"')
+        c = b''
+        print(delimiter_colon)
+        
+        if not delimiter_colon:c += bytes(value, "utf-8")
+        
+        for i in range(0, len(delimiter_colon), 2):
+            for j in range(delimiter_colon[i] + 1, delimiter_colon[i+1],2):
+                c+= bytes(chr(int(value[j:j+2], 16)), "utf-8")
+            c += bytes(value)
+            print(delimiter_colon[i], delimiter_colon[i+1], "\n\n")
+
+        # if not len(delimiter_colon) % 2:
+        #     print("content :", value)
+        print(f'{value} -> {c}')
+        open('test', 'wb').write(c)
 
     def within(value):
         # print("within :", value)

@@ -200,25 +200,25 @@ class TAG:
         # print("http_raw_uri")
         pass
 
-    # def ():
-    #     # print("")
-    #     pass
+    def http_cookie():
+        # print("http_cookie")
+        pass
 
-    # def ():
-    #     # print("")
-    #     pass
+    def dns_query():
+        # print("dns_query")
+        pass
 
-    # def ():
-    #     # print("")
-    #     pass
+    def http_stat_msg():
+        # print("http_stat_msg")
+        pass
 
-    # def ():
-    #     # print("")
-    #     pass
+    def http_server_body():
+        # print("http_server_body")
+        pass
 
-    # def ():
-    #     # print("")
-    #     pass
+    def rawbytes():
+        # print("rawbytes")
+        pass
 
     # def ():
     #     # print("")

@@ -4,7 +4,7 @@ def findall(str, sub):
     while True:
         start = str.find(sub, start)
         if start == -1: return index
-        index.append(start - 1)
+        index.append(start)
         start += len(sub)
     
 
@@ -18,23 +18,22 @@ class TAG:
         pass
 
     def content(value):
-        delimiter_colon = findall(value, '|')
         value = value.strip('"')
+        delimiter_bar = findall(value, '|')
         c = b''
-        print(delimiter_colon)
         
-        if not delimiter_colon:c += bytes(value, "utf-8")
-        
-        for i in range(0, len(delimiter_colon), 2):
-            for j in range(delimiter_colon[i] + 1, delimiter_colon[i+1],2):
-                c+= bytes(chr(int(value[j:j+2], 16)), "utf-8")
-            c += bytes(value)
-            print(delimiter_colon[i], delimiter_colon[i+1], "\n\n")
-
-        # if not len(delimiter_colon) % 2:
-        #     print("content :", value)
-        print(f'{value} -> {c}')
-        open('test', 'wb').write(c)
+        if not len(delimiter_bar): c += bytes(value, "utf-8")
+        else:
+            c += bytes(value[:delimiter_bar[0]], "utf-8")
+            for i in range(0, len(delimiter_bar), 2):
+                for j in range(delimiter_bar[i] + 1, delimiter_bar[i+1], 2):
+                    c+= bytes(chr(int(value[j:j+2], 16)), "utf-8")
+                try: c += bytes(value[delimiter_bar[i+1] + 1 : delimiter_bar[i+2]], "utf-8")
+                except:
+                    if delimiter_bar[i+1] < len(value) - 1:
+                        c += bytes(value[delimiter_bar[i+1] + 1 : len(value) - 1], "utf-8")
+        print(f'content "{value}" -> {c}')
+        # return c
 
     def within(value):
         # print("within :", value)

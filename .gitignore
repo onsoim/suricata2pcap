@@ -1,7 +1,9 @@
 # cache files
 *.pyc
+*.swp
 
 # for check status
 output.txt
 full_ruleset.rules
-test
+test*
+*.pcap

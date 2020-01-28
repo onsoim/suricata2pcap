@@ -4,8 +4,11 @@ from TAG import *
 import re
 
 if __name__ == "__main__":
+    # with open('rules/full_ruleset.rules', 'r') as r:
     with open('rules/test.rules', 'r') as r:
         rules = r.read().splitlines()
+
+    tag_http = ['http_header', 'http_uri', 'http_method', 'http_user_agent', 'http_host']
 
     for rule in rules:
         # raw_rule = re.findall(r'([^()]+)$', rule)
@@ -21,6 +24,7 @@ if __name__ == "__main__":
         for tag in tags: escape =  escape.replace(f'{tag};', '')
         if escape.strip() != '': tags.append(escape.strip())
 
+        flag = ''
         for tag in tags:
             # try: globals()[k](v)
             try:
@@ -34,29 +38,42 @@ if __name__ == "__main__":
                     if ret != None:
                         k, v = list(ret.keys())[0], list(ret.values())[0]
                         if k == 'content':
+                            flag = 'content'
                             pcap.__dict__[k].append(v)
+                        # elif k == 'depth' or k == 'within':
+                        #     c = pcap.__dict__[flag][-1]
+                        #     if v.isdecimal(): pcap.__dict__[flag][-1] = b'A' * (int(v) - len(c)) + c
+                        #     else: print(v, tag, rule)
+                        # elif k == 'distance':
+                        #     c1, c2 = pcap.__dict__[flag][-2], pcap.__dict__[flag][-1]
+                        #     if v.isdecimal(): 
+                        #         del pcap.__dict__[flag][-1]
+                        #         del pcap.__dict__[flag][-1]
+                        #         pcap.__dict__[flag].append(c1 + b'A' * int(v) + c2)
+                        #     else: print(v, tag, rule)
                         elif k == 'flow':
                             pcap.__dict__['flow'] = v
                         elif k == 'sid':
                             pcap.__dict__['sid'] = v
-                        elif k == 'within':
-                            c = pcap.__dict__['content'][-1]
-                            pcap.__dict__['content'][-1] = b'A' * (int(v) - len(c)) + c
                         else:
-                            print(k, v)
+                            if k != 'distance' and k != 'within' and k != 'depth':
+                                print(k, v)
 
                 else:
                     # ret = TAG.__dict__[tag]()
-                    if tag == 'http_uri':
-                        pcap.__dict__['http_uri'].append(pcap.__dict__['content'][-1])
+                    if tag in tag_http:
+                        flag = tag
+                        pcap.__dict__[flag].append(pcap.__dict__['content'][-1])
                         del pcap.__dict__['content'][-1]
+                    
 
             except KeyError:
-                print(f'unsupported keyword : {tag} - {rule}')
+                print(f'Unsupported keyword : {tag} - {rule}')
 
             except ValueError:
-                print(f'Value Error : {tags} {rule}')
+                print(f'Value Error : {tag} - {rule}')
 
-            except Exception as e: print(e, tag)
+            except Exception as e: print(e, tag)#, rule)
 
-        print(pcap.__dict__)
+        print(f'{rule}\n{pcap.__dict__}\n====================')
+        pcap.build()

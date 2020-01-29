@@ -7,3 +7,4 @@ output.txt
 full_ruleset.rules
 test*
 *.pcap
+pcaps*

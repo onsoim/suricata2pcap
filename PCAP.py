@@ -1,8 +1,9 @@
-import random
-import struct
 from ICMP import *
 from TCP import *
+
 import ipaddress
+import random
+
 
 class PCAP:
     def __init__(self, proto, src_ip, src_port, dst_ip, dst_port):
@@ -15,12 +16,11 @@ class PCAP:
             b'\xff\xff\x00\x00' + \
             b'\x01\x00\x00\x00'
 
-
-        self.src_ip = self.gen_ip(src_ip)
-        self.src_port = self.gen_port(src_port)
-        self.dst_ip = self.gen_ip(dst_ip)
-        self.dst_port = self.gen_port(dst_port)
-        self.proto = proto
+        self.src_ip     = self.gen_ip(src_ip)
+        self.src_port   = self.gen_port(src_port)
+        self.dst_ip     = self.gen_ip(dst_ip)
+        self.dst_port   = self.gen_port(dst_port)
+        self.proto      = proto
 
         self.sid        = 1000000
         self.content    = []
@@ -34,75 +34,97 @@ class PCAP:
 
 
     def gen_ip(self, ip):
-        flag = False
-        if ip[0] == '!':
-            ip = ip[1:]
-            flag = True
-
-        if ip[0] == '[':
-            ip = random.choice(ip[1:-1].split(','))
-
-        if ip[0] == '!':
-            ip = ip[1:]
-            flag = True
-
         if (ip == "any"): ip = self.random_ip()
-        elif (ip == "$DNS_SERVERS"): ip = "192.168.0.1"
-        elif (ip == "$HOME_NET"): ip = "192.168.0.1"
-        elif (ip == "$HTTP_SERVERS"): ip = "192.168.0.1"
-        elif (ip == "$SMTP_SERVERS"): ip = "192.168.0.1"
-        elif (ip == "$SQL_SERVERS"): ip = "192.168.0.1"
-        elif (ip == "$EXTERNAL_NET"): ip = "20.0.0.1"
+        else:
+            ip = ip.replace("$AIM_SERVERS", '192.168.0.1')
+            ip = ip.replace("$DNS_SERVERS", '192.168.0.1')
+            ip = ip.replace("$HOME_NET", '192.168.0.1')
+            ip = ip.replace("$HTTP_SERVERS", '192.168.0.1')
+            ip = ip.replace("$SMTP_SERVERS", '192.168.0.1')
+            ip = ip.replace("$SQL_SERVERS", '192.168.0.1')
+            ip = ip.replace("$TELNET_SERVERS", '192.168.0.1')
 
-        # if flag: print(list(ipaddress.ip_network('0.0.0.0/0').address_exclude(ipaddress.ip_network(ip))))
-        if (ip.find('/') + 1): ip = str(random.choice(list(ipaddress.ip_network(ip).hosts())))
-        ip = self.ip2byte(ip)
+            ip = ip.replace("$EXTERNAL_NET", '20.0.0.1')
+            
+            if ip[0] == '!':
+                ip = ip[1:]
+                exclude = [ip]
+                while ip in exclude: ip = self.random_ip()
 
-        return ip
+            elif ip[0] == '[':
+                include, exclude = None, None
+                for ex in ip[1:-1].split(','):
+                    if ex.find('!') + 1:
+                        ex = ex[1:]
+                        if not exclude: exclude = ipaddress.ip_network(ex, strict=False)
+                        else: exclude = self.add_generator(exclude, ipaddress.ip_network(ex, strict=False))
+                    else: 
+                        if not include: include = ipaddress.ip_network(ex, strict=False)
+                        else: include = self.add_generator(include, ipaddress.ip_network(ex, strict=False))
+
+                if include:
+                    include = list(include)
+                    random.shuffle(include)
+                    for ip in include:
+                        if not exclude or ip not in exclude: break
+                else:
+                    ip = ipaddress.ip_network(self.random_ip())
+                    while ip in exclude: ipaddress.ip_network(self.random_ip())
+                ip = str(ip)
+
+            elif ip.find('/') + 1:
+                ip = str(random.choice(list(ipaddress.ip_network(ip))))
+
+        return self.ip2byte(ip)
 
 
     def random_ip(self):
         return '.'.join([ str(random.randint(0,255)) for _ in range(4) ])
 
     def ip2byte(self, ip):
-        return b''.join([bytes([int(i)]) for i in ip.split('.')])
+        return b''.join([ bytes([int(i)]) for i in ip.split('.') ])
+
+    def add_generator(self, i, j):
+        for x in i: yield x
+        for x in j: yield x
 
 
     def gen_port(self, port):
         if (port == "any"): port = random.randint(1024,65535)
         else:
             port = port.replace("$HTTP_PORTS", '80')
-            port.replace("$ORACLE_PORTS", '80')
-            port.replace("$SSH_PORTS", '80')
+            port = port.replace("$ORACLE_PORTS", '80')
+            port = port.replace("$SHELLCODE_PORTS", '80')
+            port = port.replace("$SSH_PORTS", '80')
 
-            if (port[0] == '!'):
-                port = port[1:]
-                exclude = []
-                if (port[0] == '['):
+            include, exclude = [], []
+            delimiter_braket = port.find('[')
+            if delimiter_braket + 1:
+                if not delimiter_braket: 
                     for ex in port[1:-1].split(','):
+                        if ex[0] == '!': exclude.append(int(ex[1:]))
+                        elif ex.find(':') + 1:
+                            include += self.port_colon(ex)
+                        else: include.append(int(ex))
+
+                else:
+                    for ex in port[2:-1].split(','):
                         if ex.find(':') + 1: exclude += self.port_colon(ex)
                         else: exclude.append(int(ex))
+                    
+            elif port.find(',') + 1:
+                for ex in port.split(','):
+                    if port.find('!') + 1: exclude.append(port[1:])
 
-                elif port.find(':') + 1:
-                    exclude += self.port_colon(port)
-                
-                else: exclude.append(int(port))
+            elif port.find(':') + 1:
+                if port.find('!') + 1: port = random.choice(list(set(list(range(1024,65535))).difference(set(self.port_colon(port[1:])))))
+                else: port = random.choice(self.port_colon(port))
 
-                port = random.choice(list(set(list(range(1024,65535))).difference(set(exclude))))
+            elif port.find('!') + 1: port = random.choice(list(set(list(range(1024,65535))).difference(set([port[1:]]))))
 
-            elif (port[0] == '['):
-                include, exclude  = [], []
-                for ex in port[1:-1].split(','):
-                    if ex[0] == '!':
-                        ex = ex[1:]
-                        exclude.append(int(ex))
-                    elif ex.find(':') + 1: include += self.port_colon(ex)
-                    else: include.append(int(ex))
+            if len(exclude) or len(include):
                 if not len(include): include = self.port_colon(':')
                 port = random.choice(list(set(include).difference(set(exclude))))
-
-            elif (port.find(':') + 1):
-                port = random.choice(self.port_colon(port))
 
         return int(port)
     

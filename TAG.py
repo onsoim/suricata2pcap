@@ -39,7 +39,8 @@ class TAG:
     def distance(value):    return {'distance': value.strip()}
     def flow(value):        return {'flow': value.strip().split(',')}
     def within(value):      return {'within': value.strip()}
-    def sid(value):         return {'sid': value}
+    def offset(value):      return {'offset': value.strip()}
+    def sid(value):         return {'sid': value.strip()}
 
     def classtype(value):   pass
     def metadata(value):    pass
@@ -74,10 +75,6 @@ class TAG:
 
     def byte_jump(value):
         # print("byte_jump :", value)
-        pass
-
-    def offset(value):
-        # print("offset :", value)
         pass
 
     def dsize(value):

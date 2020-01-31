@@ -1,0 +1,1 @@
+alert icmp $HOME_NET any -> $EXTERNAL_NET any (msg:"INFO PTUNNEL OUTBOUND"; itype:8; icode:0; content:"|D5 20 08 80|"; depth:4; reference:url,github.com/madeye/ptunnel; reference:url,cs.uit.no/~daniels/PingTunnel/#protocol; classtype:protocol-command-decode; sid:2016145; rev:2; metadata:created_at 2013_01_03, updated_at 2013_01_03;)

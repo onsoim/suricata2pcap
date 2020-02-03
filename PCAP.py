@@ -1,5 +1,6 @@
 from ICMP import *
 from TCP import *
+from HTTP import *
 
 import ipaddress
 import random
@@ -151,6 +152,23 @@ class PCAP:
                 if "established" in self.flow:
                     wb.write(tcp.handshake_4())
 
-            if self.proto == "icmp":
+            elif self.proto == "http":
+                http = HTTP(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.content)
+                if "established" in self.flow:
+                    wb.write(http.handshake_3())
+
+                http_dict = {}
+                for h in ['http_user_agent']:
+                    if self.__dict__[h]:
+                        http_dict[h] = b''.join(self.__dict__[h])
+                wb.write(http.build(**http_dict))
+
+                if "established" in self.flow:
+                    wb.write(http.handshake_4())
+
+            elif self.proto == "icmp":
                 self.proto = ICMP(self.src_ip, self.dst_ip)
                 wb.write(self.proto.build_packet_data('8', '0', b'\x0a\x0a'))
+            
+            else:
+                print('unsupported protocol : ', self.proto)

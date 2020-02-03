@@ -16,7 +16,7 @@ class TCP:
         self.seq = 0
         self.ack = 0
 
-        print(self.__dict__)
+        # print(self.__dict__)
 
 
     def packet_header(self, length = 0):
@@ -69,7 +69,7 @@ class TCP:
     def build(self):
         c = self.packet_header(self.c_length)
         c += self.dst_mac + self.src_mac + b'\x08\x00'
-        c += b'\x45\x00' + (44 + self.c_length).to_bytes(2, 'big') + b'\x00\x01\x00\x00\x40\x06\xb6\xb2' + self.src_ip + self.dst_ip
+        c += b'\x45\x00' + (44 + self.c_length).to_bytes(2, 'big') + b'\x00\x01\x40\x00\x40\x06\xb6\xb2' + self.src_ip + self.dst_ip
         c += self.src_port.to_bytes(2, 'big') + \
             self.dst_port.to_bytes(2, 'big') + \
             self.seq.to_bytes(4, 'big') + \

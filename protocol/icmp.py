@@ -8,7 +8,7 @@ class ICMP:
         # self.build_packet_data()
         # print(self.packet_data)
 
-    def build_packet_data(self, itype, icode, content):
+    def build(self, itype, icode, content):
         self.ethernet_frame = \
             self.dst_mac + \
             self.src_mac + \
@@ -37,12 +37,3 @@ class ICMP:
             content
         
         return self.packet_data
-
-# src_ip = b'\xc0\xa8\x00\x01'
-# dst_ip = b'\xc0\xa8\x00\x01'
-# src_mac = b'\xdd\xee\xff\x44\x55\x66'
-# dst_mac = b'\xaa\xbb\xcc\x11\x22\x33'
-# itype = 8
-# icode = 0
-
-# icmp = ICMP(src_ip, dst_ip, src_mac, dst_mac)#, itype, icode)

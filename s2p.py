@@ -2,13 +2,12 @@ from PCAP import *
 from TAG import *
 
 import re
-from datetime import datetime
 import os
 
 
 if __name__ == "__main__":
-    with open('rules/full_ruleset.rules', 'r') as r:
-    # with open('rules/test.rules', 'r') as r:
+    # with open('rules/full_ruleset.rules', 'r') as r:
+    with open('rules/test.rules', 'r') as r:
         rules = r.read().splitlines()
 
     tag_http = ['http_header', 'http_uri', 'http_method', 'http_user_agent', 'http_host']
@@ -17,7 +16,7 @@ if __name__ == "__main__":
     if not os.path.isdir(folder): os.mkdir(folder)
 
     for rule in rules:
-        print(rule)
+        # print(rule)
 
         # raw_rule = re.findall(r'([^()]+)$', rule)
         # raw_header = raw_rule[0].split(" ")
@@ -46,7 +45,7 @@ if __name__ == "__main__":
                     if ret != None:
                         k, v = list(ret.keys())[0], list(ret.values())[0]
                         if k == 'content':
-                            flag = 'content'
+                            if flag != 'dns_query': flag = 'content'
                             pcap.__dict__[k].append(v)
                         elif k == 'offset':
                             c_length = 0
@@ -68,9 +67,10 @@ if __name__ == "__main__":
                             pcap.__dict__['flow'] = v
                         elif k == 'sid':
                             pcap.__dict__['sid'] = v
+                        elif k == 'dns_query':
+                            flag = 'dns_query'
                         else:
-                            if k != 'distance' and k != 'within' and k != 'depth':
-                                print(k, v)
+                            print(k, v)
 
                 else:
                     # ret = TAG.__dict__[tag]()

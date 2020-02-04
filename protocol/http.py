@@ -1,23 +1,6 @@
-from TCP import *
+from protocol.tcp import *
 
 class HTTP(TCP):
-    def __init__(self, src_ip, src_port, dst_ip, dst_port, content):
-        self.src_ip = src_ip
-        self.dst_ip = dst_ip
-        self.src_port = src_port
-        self.dst_port = dst_port
-        self.src_mac = b'\x11\x11\x11\x11\x11\x11'
-        self.dst_mac = b'\x22\x22\x22\x22\x22\x22'
-
-        self.content = b''.join(content)
-        self.c_length = len(self.content)
-
-        self.seq = 0
-        self.ack = 0
-
-        print('http :', self.__dict__)
-
-
     def build(
         self,
         http_method             = b'GET',
@@ -63,6 +46,3 @@ class HTTP(TCP):
         self.seq += self.c_length
         
         return c + self.content
-    
-# http = HTTP('192.168.0.1', '12345', '20.0.0.1', '80', b'')
-# http.build()

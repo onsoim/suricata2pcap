@@ -3,6 +3,7 @@ from protocol.icmp import *
 from protocol.tcp import *
 from protocol.udp import *
 
+from protocol.dns import *
 from protocol.http import *
 from protocol.tls import *
 
@@ -192,8 +193,8 @@ class PCAP:
                     wb.write(self.proto.build('8', '0', b'\x0a\x0a'))
                 
                 elif self.proto == "dns":
-                    # self.proto = DNS()
-                    pass
-            
+                    self.proto = DNS(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.dns_query)
+                    wb.write(self.proto.build(proto = 17))
+
             else:
                 print('unsupported protocol : ', self.proto)

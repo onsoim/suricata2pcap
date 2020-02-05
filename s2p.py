@@ -5,7 +5,7 @@ import re
 import os
 
 
-if __name__ == "__main__":
+def main():
     # with open('rules/full_ruleset.rules', 'r') as r:
     with open('rules/test.rules', 'r') as r:
         rules = r.read().splitlines()
@@ -46,7 +46,7 @@ if __name__ == "__main__":
                         k, v = list(ret.keys())[0], list(ret.values())[0]
                         if k == 'content':
                             if flag != 'dns_query': flag = 'content'
-                            pcap.__dict__[k].append(v)
+                            pcap.__dict__[flag].append(v)
                         elif k == 'offset':
                             c_length = 0
                             for c in pcap.__dict__[flag][:-1]: c_length += len(c)
@@ -67,8 +67,6 @@ if __name__ == "__main__":
                             pcap.__dict__['flow'] = v
                         elif k == 'sid':
                             pcap.__dict__['sid'] = v
-                        elif k == 'dns_query':
-                            flag = 'dns_query'
                         else:
                             print(k, v)
 
@@ -78,6 +76,8 @@ if __name__ == "__main__":
                         flag = tag
                         pcap.__dict__[flag].append(pcap.__dict__['content'][-1])
                         del pcap.__dict__['content'][-1]
+                    elif tag == 'dns_query':
+                        flag = tag
                     
 
             except KeyError:
@@ -90,3 +90,7 @@ if __name__ == "__main__":
 
         print(f'{rule}\n{pcap.__dict__}\n====================')
         pcap.build()
+
+
+if __name__ == "__main__":
+    main()

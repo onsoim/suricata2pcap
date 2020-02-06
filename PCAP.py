@@ -13,15 +13,6 @@ import random
 
 class PCAP:
     def __init__(self, proto, src_ip, src_port, dst_ip, dst_port):
-        self.golbal_header = \
-            b'\xd4\xc3\xb2\xa1' + \
-            b'\x02\x00' + \
-            b'\x04\x00' + \
-            b'\x00\x00\x00\x00' + \
-            b'\x00\x00\x00\x00' + \
-            b'\xff\xff\x00\x00' + \
-            b'\x01\x00\x00\x00'
-
         self.src_ip     = self.gen_ip(src_ip)
         self.src_port   = self.gen_port(src_port)
         self.dst_ip     = self.gen_ip(dst_ip)
@@ -145,10 +136,21 @@ class PCAP:
         return list(range(a, b))
 
 
+    def golbal_header(self):
+        return \
+            b'\xd4\xc3\xb2\xa1' + \
+            b'\x02\x00' + \
+            b'\x04\x00' + \
+            b'\x00\x00\x00\x00' + \
+            b'\x00\x00\x00\x00' + \
+            b'\xff\xff\x00\x00' + \
+            b'\x01\x00\x00\x00'
+
+
     def build(self):
         with open(f'pcaps/{self.sid}.pcap', 'wb') as wb:
             if self.proto.upper() in list(globals()):
-                wb.write(self.golbal_header)
+                wb.write(self.golbal_header())
                 
                 if self.proto == "tcp":
                     tcp = TCP(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.content)

@@ -44,7 +44,7 @@ def main():
                     # if ret == None: print(k)
                     if ret != None:
                         k, v = list(ret.keys())[0], list(ret.values())[0]
-                        if k == 'content':
+                        if k == 'content' or k == 'pcre':
                             if flag != 'dns_query': flag = 'content'
                             pcap.__dict__[flag].append(v)
                         elif k == 'offset':
@@ -65,6 +65,12 @@ def main():
                             else: print(v, tag, rule)
                         elif k == 'flow':
                             pcap.__dict__['flow'] = v
+                        elif k == 'isdataat':
+                            if 'relative' in v:
+                                del v[v.index('relative')]
+                                if v[0][0] == '!': v = b'A' * (int(v[0][1:]) - 1)
+                                else: v = b'A' * (int(v[0]))
+                                pcap.__dict__[flag][-1] += v
                         elif k == 'sid':
                             pcap.__dict__['sid'] = v
                         else:
@@ -88,8 +94,9 @@ def main():
 
             except Exception as e: print(e, tag)#, rule)
 
+        try: pcap.build()
+        except Exception as e: print(f'Build error : {e} - {rule}')
         print(f'{rule}\n{pcap.__dict__}\n====================')
-        pcap.build()
 
 
 if __name__ == "__main__":

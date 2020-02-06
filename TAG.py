@@ -1,4 +1,5 @@
 import binascii
+import rstr
 
 def findall(str, sub):
     index = []
@@ -37,9 +38,11 @@ class TAG:
 
     def depth(value):       return {'depth': value.strip()}
     def distance(value):    return {'distance': value.strip()}
+    def isdataat(value):    return {'isdataat': [ v.strip() for v in value.split(',') ]}
     def flow(value):        return {'flow': value.strip().split(',')}
     def within(value):      return {'within': value.strip()}
     def offset(value):      return {'offset': value.strip()}
+    def pcre(value):        return {'pcre': rstr.xeger(value)}
     def sid(value):         return {'sid': value.strip()}
 
     def classtype(value):   pass
@@ -47,26 +50,15 @@ class TAG:
     def msg(value):         pass
     def reference(value):   pass
     def rev(value):         pass
+    def threshold(value):   pass
 
 
     def flowbits(value):
         # print("flowbits :", value)
         pass
     
-    def threshold(value):
-        # print("threshold :", value)
-        pass
-    
     def flags(value):
         # print("flags :", value)
-        pass
-
-    def pcre(value):
-        # print("pcre :", value)
-        pass
-
-    def isdataat(value):
-        # print("isdataat :", value)
         pass
 
     def byte_test(value):

@@ -9,3 +9,4 @@ pyxdg==0.25
 rstr==2.2.6
 SecretStorage==2.3.1
 six==1.11.0
+xeger==0.3.5

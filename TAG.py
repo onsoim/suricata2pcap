@@ -1,5 +1,7 @@
 import binascii
 import rstr
+from xeger import Xeger
+
 
 def findall(str, sub):
     index = []
@@ -36,13 +38,23 @@ class TAG:
         # print(f'content "{value}" -> {c}')
         return {'content': c}
 
+    def pcre(value):
+        ret, cnt = None, 10
+        while ret == None and cnt:
+            try: ret = rstr.xeger(value[value.find('/') + 1: value.rfind('/')])
+            except:
+                try: ret = Xeger().xeger(value[value.find('/') + 1: value.rfind('/')])
+                except: cnt -= 1
+        if ret == None: print('Failed to generate pcre.')
+        # print(f'pcre "{value}" -> {ret.encode()}')
+        return {'pcre': ret.encode()}
+
     def depth(value):       return {'depth': value.strip()}
     def distance(value):    return {'distance': value.strip()}
     def isdataat(value):    return {'isdataat': [ v.strip() for v in value.split(',') ]}
     def flow(value):        return {'flow': value.strip().split(',')}
     def within(value):      return {'within': value.strip()}
     def offset(value):      return {'offset': value.strip()}
-    def pcre(value):        return {'pcre': rstr.xeger(value)}
     def sid(value):         return {'sid': value.strip()}
 
     def classtype(value):   pass

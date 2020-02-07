@@ -13,6 +13,8 @@ COPY . /home
 
 WORKDIR /home
 
+RUN pip3 install -r requirements.txt
+
 RUN git config --global user.email onsoim@gmail.com && \
     git config --global user.name onsoim
 

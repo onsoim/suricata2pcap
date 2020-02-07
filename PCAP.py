@@ -149,7 +149,7 @@ class PCAP:
 
     def build(self):
         with open(f'pcaps/{self.sid}.pcap', 'wb') as wb:
-            if self.proto.upper() in list(globals()):
+            if self.proto.upper() in list(globals()) + ['IP']:
                 wb.write(self.golbal_header())
                 
                 if self.proto == "tcp":
@@ -186,7 +186,7 @@ class PCAP:
                     if "established" in self.flow:
                         wb.write(http.handshake_4())
 
-                elif self.proto == "udp":
+                elif self.proto == "udp" or self.proto == "ip":
                     self.proto = UDP(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.content)
                     wb.write(self.proto.build(proto = 17))
 
@@ -198,5 +198,4 @@ class PCAP:
                     self.proto = DNS(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.dns_query)
                     wb.write(self.proto.build(proto = 17))
 
-            else:
-                print('unsupported protocol : ', self.proto)
+            # else: print('unsupported protocol : ', self.proto)

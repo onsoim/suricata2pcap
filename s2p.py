@@ -57,11 +57,8 @@ def main():
                             if v.isdecimal(): pcap.__dict__[flag][-1] = b'A' * (int(v) - len(c)) + c
                             else: print(v, tag, rule)
                         elif k == 'distance':
-                            c1, c2 = pcap.__dict__[flag][-2], pcap.__dict__[flag][-1]
-                            if v.isdecimal(): 
-                                del pcap.__dict__[flag][-1]
-                                del pcap.__dict__[flag][-1]
-                                pcap.__dict__[flag].append(c1 + b'A' * int(v) + c2)
+                            c = pcap.__dict__[flag][-1]
+                            if v.isdecimal(): pcap.__dict__[flag][-1] = b'A' * int(v) + c
                             else: print(v, tag, rule)
                         elif k == 'flow':
                             pcap.__dict__['flow'] = v
@@ -70,7 +67,12 @@ def main():
                                 del v[v.index('relative')]
                                 if v[0][0] == '!': v = b'A' * (int(v[0][1:]) - 1)
                                 else: v = b'A' * (int(v[0]))
+                                print(pcap.__dict__, flag, v)
                                 pcap.__dict__[flag][-1] += v
+                            else:
+                                c_length = 0
+                                for c in pcap.__dict__[flag]: c_length += len(c)
+                                pcap.__dict__[flag].append(b'A' * (int(v[0]) - c_length))
                         elif k == 'sid':
                             pcap.__dict__['sid'] = v
                         else:
@@ -92,11 +94,12 @@ def main():
             except ValueError:
                 print(f'Value Error : {tag} - {rule}')
 
-            except Exception as e: print(e, tag)#, rule)
+            except Exception as e: print(f'{e} / {tag} - {rule}')
 
         try: pcap.build()
-        except Exception as e: print(f'Build error : {e} - {rule}')
-        print(f'{rule}\n{pcap.__dict__}\n====================')
+        except Exception as e:
+            print(f'Build error : {e} - {rule}')
+            print(f'{pcap.__dict__}\n====================')
 
 
 if __name__ == "__main__":

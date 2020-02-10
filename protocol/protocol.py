@@ -2,16 +2,13 @@ import struct
 from datetime import datetime
 
 class PROTOCOL:
-    def __init__(self, src_ip, src_port, dst_ip, dst_port, content):
+    def __init__(self, src_ip, src_port, dst_ip, dst_port):
         self.src_ip     = src_ip
         self.dst_ip     = dst_ip
         self.src_port   = src_port
         self.dst_port   = dst_port
         self.src_mac    = b'\x11\x11\x11\x11\x11\x11'
         self.dst_mac    = b'\x22\x22\x22\x22\x22\x22'
-
-        self.content = b''.join(content)
-        self.c_length = len(self.content)
 
         print(self.__dict__)
 

@@ -1,13 +1,6 @@
 from protocol.protocol import *
 
 class ICMP(PROTOCOL):
-    def __init__(self, src_ip, dst_ip):
-        self.src_ip = src_ip
-        self.dst_ip = dst_ip
-        self.src_mac = b'\x11\x11\x11\x11\x11\x11'
-        self.dst_mac = b'\x22\x22\x22\x22\x22\x22'
-
-
     def build(self, itype = 8, icode = 0, content = b''):
         self.ethernet_frame = \
             self.dst_mac + \

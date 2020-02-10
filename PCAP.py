@@ -18,20 +18,16 @@ class PCAP:
         self.dst_ip     = self.gen_ip(dst_ip)
         self.dst_port   = self.gen_port(dst_port)
 
-        # if proto.upper() in list(globals()) + ['IP']:
-        #     self.proto = globals()[proto.upper()](self.src_ip, self.src_port, self.dst_ip, self.dst_port)
-        # else: print('unsupported protocol : ', proto)
-        self.proto      = proto
+        if proto == 'ip': proto = 'udp'
+
+        if proto.upper() in list(globals()):
+            self.proto = globals()[proto.upper()](self.src_ip, self.src_port, self.dst_ip, self.dst_port)
+        else: print('unsupported protocol : ', proto)
+        # self.proto      = proto
 
         self.sid        = 1000000
         self.content    = []
         self.flow       = []
-
-        self.http_header        = []
-        self.http_host          = []
-        self.http_method        = []
-        self.http_uri           = []
-        self.http_user_agent    = []
 
         self.dns_query  = []
         self.itype      = 8
@@ -156,54 +152,48 @@ class PCAP:
 
     def build(self):
         with open(f'pcaps/{self.sid}.pcap', 'wb') as wb:
-            if self.proto.upper() in list(globals()) + ['IP']:
+            if self.proto:
                 wb.write(self.golbal_header())
+                wb.write(self.proto.build())
+
+                # if "tcp" in str(self.proto.__class__):
+                #     wb.write(self.proto.build())
+
+                # elif self.proto == "tls":
+                #     tls = TLS(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.content)
+                #     if "established" in self.flow:
+                #         wb.write(tls.handshake_3())
+
+                #     wb.write(tls.build())
+
+                #     if "established" in self.flow:
+                #         wb.write(tls.handshake_4())
+
+                # elif "http" in str(self.proto.__class__):
+                #     # http = HTTP(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.content)
+                #     if "established" in self.flow:
+                #         wb.write(self.proto.handshake_3())
+
+                #     # http_dict = {}
+                #     # for h in ['http_user_agent']:
+                #     #     if self.proto.__dict__[h]:
+                #     #         http_dict[h] = b''.join(self.proto.__dict__[h])
+                #     wb.write(self.proto.build())
+
+                #     if "established" in self.flow:
+                #         wb.write(self.proto.handshake_4())
+
+                # elif self.proto == "udp" or self.proto == "ip":
+                #     # self.proto = UDP(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.content)
+                #     wb.write(self.proto.build(proto = 17))
+
+                # # elif self.proto == "icmp":
+                # #     self.proto = ICMP(self.src_ip, self.dst_ip)
+
+                # #     wb.write(self.proto.build(itype = self.itype, icode = self.icode, content = b'\x0a\x0a'))
                 
-                if self.proto == "tcp":
-                    tcp = TCP(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.content)
-                    if "established" in self.flow:
-                        wb.write(tcp.handshake_3())
-
-                    wb.write(tcp.build())
-
-                    if "established" in self.flow:
-                        wb.write(tcp.handshake_4())
-
-                elif self.proto == "tls":
-                    tls = TLS(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.content)
-                    if "established" in self.flow:
-                        wb.write(tls.handshake_3())
-
-                    wb.write(tls.build())
-
-                    if "established" in self.flow:
-                        wb.write(tls.handshake_4())
-
-                elif self.proto == "http":
-                    http = HTTP(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.content)
-                    if "established" in self.flow:
-                        wb.write(http.handshake_3())
-
-                    http_dict = {}
-                    for h in ['http_user_agent']:
-                        if self.__dict__[h]:
-                            http_dict[h] = b''.join(self.__dict__[h])
-                    wb.write(http.build(**http_dict))
-
-                    if "established" in self.flow:
-                        wb.write(http.handshake_4())
-
-                elif self.proto == "udp" or self.proto == "ip":
-                    self.proto = UDP(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.content)
-                    wb.write(self.proto.build(proto = 17))
-
-                elif self.proto == "icmp":
-                    self.proto = ICMP(self.src_ip, self.dst_ip)
-
-                    wb.write(self.proto.build(itype = self.itype, icode = self.icode, content = b'\x0a\x0a'))
-                
-                elif self.proto == "dns":
-                    self.proto = DNS(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.dns_query)
-                    wb.write(self.proto.build())
+                # elif self.proto == "dns":
+                #     self.proto = DNS(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.dns_query)
+                #     wb.write(self.proto.build())
 
             # else: print('unsupported protocol : ', self.proto)

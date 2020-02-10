@@ -1,6 +1,23 @@
 from protocol.protocol import *
 
 class TCP(PROTOCOL):
+    def __init__(self, src_ip, src_port, dst_ip, dst_port, content):
+        self.src_ip = src_ip
+        self.dst_ip = dst_ip
+        self.src_port = src_port
+        self.dst_port = dst_port
+        self.src_mac = b'\x11\x11\x11\x11\x11\x11'
+        self.dst_mac = b'\x22\x22\x22\x22\x22\x22'
+
+        self.content = b''.join(content)
+        self.c_length = len(self.content)
+
+        self.seq = 0
+        self.ack = 0
+        
+        # print(self.__dict__)
+
+
     def handshake_3(self):
         c = self.packet_header()
         c += self.dst_mac + self.src_mac + b'\x08\x00'
@@ -41,7 +58,7 @@ class TCP(PROTOCOL):
 
 
     def build(self, proto = 6):
-        c = self.packet_header(self.c_length)
+        c = self.packet_header(c_length = self.c_length)
         c += self.dst_mac + self.src_mac + b'\x08\x00'
         c += b'\x45\x00' + (44 + self.c_length).to_bytes(2, 'big') + b'\x00\x01\x40\x00\x40' + bytes([proto]) + b'\xb6\xb2' + self.src_ip + self.dst_ip
         c += self.src_port.to_bytes(2, 'big') + \

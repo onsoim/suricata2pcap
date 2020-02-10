@@ -45,13 +45,16 @@ class TAG:
             except:
                 try: ret = Xeger().xeger(value[value.find('/') + 1: value.rfind('/')])
                 except: cnt -= 1
-        if ret == None: print('Failed to generate pcre.')
         # print(f'pcre "{value}" -> {ret.encode()}')
-        return {'pcre': ret.encode()}
+        if ret == None: print('Failed to generate pcre.')
+        else: return {'pcre': ret.encode()}
+        
 
     def depth(value):       return {'depth': value.strip()}
     def distance(value):    return {'distance': value.strip()}
+    def icode(value):       return {'icode': int(value.strip())}
     def isdataat(value):    return {'isdataat': [ v.strip() for v in value.split(',') ]}
+    def itype(value):       return {'itype': int(value.strip())}
     def flow(value):        return {'flow': value.strip().split(',')}
     def within(value):      return {'within': value.strip()}
     def offset(value):      return {'offset': value.strip()}
@@ -83,14 +86,6 @@ class TAG:
 
     def dsize(value):
         # print("dsize :", value)
-        pass
-
-    def itype(value):
-        # print("itype :", value)
-        pass
-
-    def icode(value):
-        # print("icode :", value)
         pass
 
     def tag(value):

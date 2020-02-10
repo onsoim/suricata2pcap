@@ -47,6 +47,7 @@ def main():
                         if k == 'content' or k == 'pcre':
                             if flag != 'dns_query': flag = 'content'
                             pcap.__dict__[flag].append(v)
+                            # pcap.proto.__dict__[flag].append(v)
                         elif k == 'offset':
                             c_length = 0
                             for c in pcap.__dict__[flag][:-1]: c_length += len(c)
@@ -67,14 +68,14 @@ def main():
                                 del v[v.index('relative')]
                                 if v[0][0] == '!': v = b'A' * (int(v[0][1:]) - 1)
                                 else: v = b'A' * (int(v[0]))
-                                print(pcap.__dict__, flag, v)
+                                # print('isdataat', pcap.__dict__, flag, v)
                                 pcap.__dict__[flag][-1] += v
                             else:
                                 c_length = 0
                                 for c in pcap.__dict__[flag]: c_length += len(c)
                                 pcap.__dict__[flag].append(b'A' * (int(v[0]) - c_length))
-                        elif k == 'sid':
-                            pcap.__dict__['sid'] = v
+                        elif k in ['sid', 'icode', 'itype']:
+                            pcap.__dict__[k] = v
                         else:
                             print(k, v)
 
@@ -89,12 +90,12 @@ def main():
                     
 
             except KeyError:
-                print(f'Unsupported keyword : {tag} - {rule}')
+                print(f'Key keyword : {tag} - {rule}')
 
             except ValueError:
                 print(f'Value Error : {tag} - {rule}')
 
-            except Exception as e: print(f'{e} / {tag} - {rule}')
+            except Exception as e: print(f'Unknown Error : {e} / {tag} - {rule}')
 
         try: pcap.build()
         except Exception as e:

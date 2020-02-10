@@ -1,14 +1,14 @@
-class ICMP:
+from protocol.protocol import *
+
+class ICMP(PROTOCOL):
     def __init__(self, src_ip, dst_ip):
         self.src_ip = src_ip
         self.dst_ip = dst_ip
         self.src_mac = b'\x11\x11\x11\x11\x11\x11'
         self.dst_mac = b'\x22\x22\x22\x22\x22\x22'
 
-        # self.build_packet_data()
-        # print(self.packet_data)
 
-    def build(self, itype, icode, content):
+    def build(self, itype = 8, icode = 0, content = b''):
         self.ethernet_frame = \
             self.dst_mac + \
             self.src_mac + \
@@ -27,10 +27,11 @@ class ICMP:
             self.dst_ip
 
         self.packet_data = \
+            self.packet_header(b_length = 42, c_length = len(content)) + \
             self.ethernet_frame + \
             self.ip_frame + \
-            bytes([int(itype)]) + \
-            bytes([int(icode)]) + \
+            bytes([itype]) + \
+            bytes([icode]) + \
             b'\x00\x00' + \
             b'\x00\x00' + \
             b'\x00\x00' + \

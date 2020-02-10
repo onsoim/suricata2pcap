@@ -7,7 +7,7 @@ class TLS(TCP):
             self.content
         self.c_length = len(self.content)
 
-        c = self.packet_header(self.c_length)
+        c = self.packet_header(c_length = self.c_length)
         c += self.dst_mac + self.src_mac + b'\x08\x00'
         c += b'\x45\x00' + (44 + self.c_length).to_bytes(2, 'big') + b'\x00\x01\x40\x00\x40' + bytes([proto]) + b'\xb6\xb2' + self.src_ip + self.dst_ip
         c += self.src_port.to_bytes(2, 'big') + \

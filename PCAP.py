@@ -17,6 +17,10 @@ class PCAP:
         self.src_port   = self.gen_port(src_port)
         self.dst_ip     = self.gen_ip(dst_ip)
         self.dst_port   = self.gen_port(dst_port)
+
+        # if proto.upper() in list(globals()) + ['IP']:
+        #     self.proto = globals()[proto.upper()](self.src_ip, self.src_port, self.dst_ip, self.dst_port)
+        # else: print('unsupported protocol : ', proto)
         self.proto      = proto
 
         self.sid        = 1000000
@@ -30,6 +34,9 @@ class PCAP:
         self.http_user_agent    = []
 
         self.dns_query  = []
+        self.itype      = 8
+        self.icode      = 0
+
 
 
     def gen_ip(self, ip):
@@ -192,10 +199,11 @@ class PCAP:
 
                 elif self.proto == "icmp":
                     self.proto = ICMP(self.src_ip, self.dst_ip)
-                    wb.write(self.proto.build('8', '0', b'\x0a\x0a'))
+
+                    wb.write(self.proto.build(itype = self.itype, icode = self.icode, content = b'\x0a\x0a'))
                 
                 elif self.proto == "dns":
                     self.proto = DNS(self.src_ip, self.src_port, self.dst_ip, self.dst_port, self.dns_query)
-                    wb.write(self.proto.build(proto = 17))
+                    wb.write(self.proto.build())
 
             # else: print('unsupported protocol : ', self.proto)

@@ -4,7 +4,7 @@ class TLS(TCP):
     def build(self, proto = 6):
         self.content = b'\x17' + b'\x03\x03' + \
             (len(self.content)).to_bytes(2, 'big') + \
-            self.content
+            b''.join(self.content)
         self.c_length = len(self.content)
 
         c = self.packet_header(c_length = self.c_length)

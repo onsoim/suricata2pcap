@@ -13,7 +13,13 @@ class HTTP(TCP):
         self.c_length   = 0
         self.flow       = []
 
+        self.http_client_body       = []
+        self.http_cookie            = []
         self.http_header            = []
+        self.http_stat_code         = []
+        self.http_stat_msg          = []
+        self.http_raw_header        = []
+        self.http_raw_uri           = []
 
         self.http_method            = []
         self.http_uri               = []

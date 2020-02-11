@@ -10,7 +10,10 @@ class PROTOCOL:
         self.src_mac    = b'\x11\x11\x11\x11\x11\x11'
         self.dst_mac    = b'\x22\x22\x22\x22\x22\x22'
 
-        print(self.__dict__)
+        self.content    = []
+        self.c_length   = 0
+
+        # print(self.__dict__)
 
 
     def packet_header(self, b_length = 58, c_length = 0):

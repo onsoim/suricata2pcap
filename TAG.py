@@ -152,36 +152,8 @@ class TAG:
         # print("ftpbounce")
         pass
 
-    def http_client_body():
-        # print("http_client_body")
-        pass
-
-    def http_raw_header():
-        # print("http_raw_header")
-        pass
-
     def file_data():
         # print("file_data")
-        pass
-
-    def http_stat_code():
-        # print("http_stat_code")
-        pass
-
-    def http_raw_uri():
-        # print("http_raw_uri")
-        pass
-
-    def http_cookie():
-        # print("http_cookie")
-        pass
-
-    def dns_query():
-        # print("dns_query")
-        pass
-
-    def http_stat_msg():
-        # print("http_stat_msg")
         pass
 
     def http_server_body():

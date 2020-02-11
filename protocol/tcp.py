@@ -1,16 +1,17 @@
 from protocol.protocol import *
 
 class TCP(PROTOCOL):
-    def __init__(self, src_ip, src_port, dst_ip, dst_port, content):
-        self.src_ip = src_ip
-        self.dst_ip = dst_ip
-        self.src_port = src_port
-        self.dst_port = dst_port
-        self.src_mac = b'\x11\x11\x11\x11\x11\x11'
-        self.dst_mac = b'\x22\x22\x22\x22\x22\x22'
+    def __init__(self, src_ip, src_port, dst_ip, dst_port):
+        self.src_ip     = src_ip
+        self.dst_ip     = dst_ip
+        self.src_port   = src_port
+        self.dst_port   = dst_port
+        self.src_mac    = b'\x11\x11\x11\x11\x11\x11'
+        self.dst_mac    = b'\x22\x22\x22\x22\x22\x22'
 
-        self.content = b''.join(content)
-        self.c_length = len(self.content)
+        self.content    = []
+        self.c_length   = 0
+        self.flow       = []
 
         self.seq = 0
         self.ack = 0
@@ -58,6 +59,9 @@ class TCP(PROTOCOL):
 
 
     def build(self, proto = 6):
+        self.content = b''.join(self.content)
+        self.c_length = len(self.content)
+
         c = self.packet_header(c_length = self.c_length)
         c += self.dst_mac + self.src_mac + b'\x08\x00'
         c += b'\x45\x00' + (44 + self.c_length).to_bytes(2, 'big') + b'\x00\x01\x40\x00\x40' + bytes([proto]) + b'\xb6\xb2' + self.src_ip + self.dst_ip
@@ -71,7 +75,8 @@ class TCP(PROTOCOL):
             self.c_length.to_bytes(2, 'big')
         self.seq += self.c_length
 
-        return c + self.content
+        if "established" not in self.flow: return c + self.content
+        return self.handshake_3() + c + self.content + self.handshake_4()
 
 
     def handshake_4(self):

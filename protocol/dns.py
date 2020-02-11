@@ -2,6 +2,7 @@ from protocol.udp import *
 
 class DNS(UDP):
     def build(self, proto = 17):
+        self.content = self.content[0] # b''.join(self.content)
         for l in self.content.split(b'.'):
             if len(l): self.content += bytes([len(l)]) + l
             else: self.content += b'\x03www'

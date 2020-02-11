@@ -20,8 +20,6 @@ class PCAP:
         self.dst_ip     = self.gen_ip(dst_ip)
         self.dst_port   = self.gen_port(dst_port)
 
-        if proto == 'ip': proto = 'udp'
-
         if proto.upper() in list(globals()):
             self.proto = globals()[proto.upper()](self.src_ip, self.src_port, self.dst_ip, self.dst_port)
         else: self.proto = proto

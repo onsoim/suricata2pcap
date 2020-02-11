@@ -75,7 +75,6 @@ class TCP(PROTOCOL):
             self.c_length.to_bytes(2, 'big')
         self.seq += self.c_length
 
-        if "established" not in self.flow: return c + self.content
         return self.handshake_3() + c + self.content + self.handshake_4()
 
 

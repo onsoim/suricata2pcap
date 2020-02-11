@@ -13,7 +13,7 @@ def findall(str, sub):
         start += len(sub)
     
 
-class TAG:
+class OPTION:
     def content(value):
         flag = False
         if value[0] == '!':

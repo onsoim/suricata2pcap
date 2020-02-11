@@ -1,5 +1,6 @@
 from protocol.protocol import *
 
+# class inheritance from 'PROTOCOL'
 class ICMP(PROTOCOL):
     def __init__(self, src_ip, src_port, dst_ip, dst_port):
         self.src_ip     = src_ip
@@ -18,11 +19,15 @@ class ICMP(PROTOCOL):
 
 
     def build(self, content = b''):
+        ''' build icmp's header and data '''
+
+        # build layer 2 (Ethernet)
         self.ethernet_frame = \
             self.dst_mac + \
             self.src_mac + \
             b'\x08\x00'
 
+        # build layer 3 (IP)
         self.ip_frame = \
             b'\x45' + \
             b'\x00' + \
@@ -37,6 +42,7 @@ class ICMP(PROTOCOL):
 
         self.content = b''.join(self.content)
 
+        # build layer 4 (ICMP) and combine with 'packet header', 'ethernet header', 'ip header'
         self.packet_data = \
             self.packet_header(b_length = 42, c_length = len(self.content)) + \
             self.ethernet_frame + \

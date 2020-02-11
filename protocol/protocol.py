@@ -17,6 +17,8 @@ class PROTOCOL:
 
 
     def packet_header(self, b_length = 58, c_length = 0):
+        ''' build common packet's header '''
+        
         return \
             struct.pack("<I", int(datetime.now().timestamp())) + \
             struct.pack("<I", datetime.now().microsecond) + \

@@ -1,5 +1,6 @@
 from protocol.tcp import *
 
+# class inheritance from 'TCP'
 class HTTP(TCP):
     def __init__(self, src_ip, src_port, dst_ip, dst_port):
         self.src_ip     = src_ip
@@ -13,6 +14,7 @@ class HTTP(TCP):
         self.c_length   = 0
         self.flow       = []
 
+        # below variables store raw value from a given rule
         self.http_client_body       = []
         self.http_cookie            = []
         self.http_header            = []
@@ -21,6 +23,7 @@ class HTTP(TCP):
         self.http_raw_header        = []
         self.http_raw_uri           = []
 
+        # todo : have to parsing value from above variables
         self.http_method            = []
         self.http_uri               = []
         self.http_version           = []
@@ -32,6 +35,7 @@ class HTTP(TCP):
         self.http_accept_encoding   = []
         self.http_accept_language   = []
 
+        # default values if nothing coming in
         self.method            = b'GET'
         self.uri               = b'/'
         self.version           = b'HTTP/1.1'
@@ -50,6 +54,8 @@ class HTTP(TCP):
 
     
     def build_http(self):
+        ''' build http's data '''
+
         for h in self.http_header: self.__dict__[h[:h.decode().find(':')].decode().lower().replace('-', '_')] = h
 
         self.content = b' '.join([self.method, self.uri, self.version]) + b'\r\n' + \
@@ -65,11 +71,21 @@ class HTTP(TCP):
 
 
     def build(self):
+        ''' build http's header and data '''
+
+        # build http's data from variables related to http
         self.build_http()
 
+        # build packet header
         c = self.packet_header(c_length = self.c_length)
+
+        # build layer 2 (Ethernet)
         c += self.dst_mac + self.src_mac + b'\x08\x00'
+
+        # build layer 3 (IP)
         c += b'\x45\x00' + (44 + self.c_length).to_bytes(2, 'big') + b'\x00\x01\x40\x00\x40\x06\xb6\xb2' + self.src_ip + self.dst_ip
+
+        # build layer 4 (TCP)
         c += self.src_port.to_bytes(2, 'big') + \
             self.dst_port.to_bytes(2, 'big') + \
             self.seq.to_bytes(4, 'big') + \
@@ -80,5 +96,4 @@ class HTTP(TCP):
             self.c_length.to_bytes(2, 'big')
         self.seq += self.c_length
         
-        if "established" not in self.flow: return c + self.content
         return self.handshake_3() + c + self.content + self.handshake_4()

@@ -18,6 +18,7 @@ class HTTP(TCP):
         self.http_client_body       = []
         self.http_cookie            = []
         self.http_header            = []
+        self.http_server_body       = []
         self.http_stat_code         = []
         self.http_stat_msg          = []
         self.http_raw_header        = []
@@ -56,7 +57,7 @@ class HTTP(TCP):
     def build_http(self):
         ''' build http's data '''
 
-        for h in self.http_header: self.__dict__[h[:h.decode().find(':')].decode().lower().replace('-', '_')] = h
+        # for h in self.http_header: self.__dict__[h[:h.decode().find(':')].decode().lower().replace('-', '_')] = h
 
         self.content = b' '.join([self.method, self.uri, self.version]) + b'\r\n' + \
             self.host + b'\r\n' + \

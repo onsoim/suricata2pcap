@@ -152,6 +152,10 @@ class PCAP:
                 wb.write(self.golbal_header())
                 wb.write(self.proto.build())
 
+        except AttributeError:
+            os.remove(filename)
+            print(f'Unsupported protocol: {self.rule.split(" ")[1]}')
+
         except Exception as e:
             os.remove(filename)
             print(f'Build error : {e}')

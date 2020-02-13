@@ -8,3 +8,4 @@ full_ruleset.rules
 test*
 *.pcap
 pcaps*
+*.yaml

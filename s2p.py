@@ -6,8 +6,8 @@ import os
 
 
 def main():
-    # with open('rules/full_ruleset.rules', 'r') as r:
-    with open('rules/test.rules', 'r') as r:
+    with open('rules/full_ruleset.rules', 'r') as r:
+    # with open('rules/test.rules', 'r') as r:
         rules = r.read().splitlines()
 
     # output folder for generated pcaps
@@ -30,7 +30,7 @@ def main():
         if escape.strip() != '': options.append(escape.strip())
 
         # flag stores a target where to put the content like dns_query
-        flag = ''
+        flag = 'content'
         for option in options:
             try:
                 delimiter_colon = option.find(':')
@@ -42,7 +42,7 @@ def main():
                     delimiter_dot = k.find('.')
                     if delimiter_dot != -1: k = k.replace('.', '_')
 
-                    ret = option.__dict__[k](v)
+                    ret = OPTION.__dict__[k](v)
                     if ret != None:
                         k, v = list(ret.keys())[0], list(ret.values())[0]
                         

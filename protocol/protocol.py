@@ -1,6 +1,7 @@
 import struct
 from datetime import datetime
 
+# This PROTOCOL class would be a skeleton class of any protocol
 class PROTOCOL:
     def __init__(self, src_ip, src_port, dst_ip, dst_port):
         self.src_ip     = src_ip

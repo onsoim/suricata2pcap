@@ -55,7 +55,7 @@ class OPTION:
     def icode(value):       return {'icode': int(value.strip())}
     def isdataat(value):    return {'isdataat': [ v.strip() for v in value.split(',') ]}
     def itype(value):       return {'itype': int(value.strip())}
-    def flow(value):        return {'flow': value.strip().split(',')}
+    def flow(value):        return {'flow': [ v.strip() for v in value.split(',') ]}
     def within(value):      return {'within': value.strip()}
     def offset(value):      return {'offset': value.strip()}
     def sid(value):         return {'sid': value.strip()}

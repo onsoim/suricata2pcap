@@ -3,11 +3,15 @@ from OPTION import *
 
 import re
 import os
+import yaml
 
 
 def main():
-    with open('rules/full_ruleset.rules', 'r') as r:
-    # with open('rules/test.rules', 'r') as r:
+    with open('suricata.yaml') as f: groups = yaml.load(f, Loader=yaml.SafeLoader)['vars']
+    address, port = groups['address-groups'], groups['port-groups']
+
+    # with open('rules/full_ruleset.rules', 'r') as r:
+    with open('rules/test.rules', 'r') as r:
         rules = r.read().splitlines()
 
     # output folder for generated pcaps
@@ -20,8 +24,8 @@ def main():
         raw_header, raw_options = [x for x in rule[:delimiter_parentheses - 1].split(' ') if x], rule[delimiter_parentheses + 1: -1]
         if raw_header[1].find('tcp') + 1 and raw_options.find('http_') + 1: raw_header[1] = 'http'
 
-        # consturct PCAP object with 'rule', 'protocol', 'source ip', 'source port', 'destination ip', 'destination port'
-        pcap = PCAP(rule, raw_header[1], raw_header[2], raw_header[3], raw_header[5], raw_header[6])
+        # consturct PCAP object with 'rule', 'address info from yaml', 'port info from yaml', 'protocol', 'source ip', 'source port', 'destination ip', 'destination port'
+        pcap = PCAP(rule, address, port, raw_header[1], raw_header[2], raw_header[3], raw_header[5], raw_header[6])
 
         # extract all options without pcre from a given rule to the list 'options' and add pcre option seperately
         options = [ option.group(0)[:-1] for option in re.finditer(r'([\w.]{2,})(:("[^"]*"|[^;\\]*))?;', raw_options) ] 
@@ -107,5 +111,5 @@ def main():
         # build a pcap with parsed options
         pcap.build()
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     main()

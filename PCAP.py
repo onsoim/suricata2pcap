@@ -13,8 +13,11 @@ import os
 
 
 class PCAP:
-    def __init__(self, rule, proto, src_ip, src_port, dst_ip, dst_port):
+    def __init__(self, rule, address, port, proto, src_ip, src_port, dst_ip, dst_port):
         self.rule       = rule
+        self.address    = address
+        self.port       = port
+
         self.src_ip     = self.gen_ip(src_ip)
         self.src_port   = self.gen_port(src_port)
         self.dst_ip     = self.gen_ip(dst_ip)
@@ -33,16 +36,10 @@ class PCAP:
     def gen_ip(self, ip):
         if (ip == "any"): ip = self.random_ip()
         else:
-            ip = ip.replace("$AIM_SERVERS", '192.168.0.1')
-            ip = ip.replace("$DNS_SERVERS", '192.168.0.1')
-            ip = ip.replace("$HOME_NET", '192.168.0.1')
-            ip = ip.replace("$HTTP_SERVERS", '192.168.0.1')
-            ip = ip.replace("$SMTP_SERVERS", '192.168.0.1')
-            ip = ip.replace("$SQL_SERVERS", '192.168.0.1')
-            ip = ip.replace("$TELNET_SERVERS", '192.168.0.1')
+            while (ip.find('$') + 1):
+                for ad in list(self.address):
+                    ip = ip.replace(f'${ad}', self.address[ad])
 
-            ip = ip.replace("$EXTERNAL_NET", '20.0.0.1')
-            
             if ip[0] == '!':
                 ip = ip[1:]
                 exclude = [ip]
@@ -60,20 +57,22 @@ class PCAP:
                         else: include = self.add_generator(include, ipaddress.ip_network(ex, strict=False))
 
                 if include:
-                    include = list(include)
-                    random.shuffle(include)
                     for ip in include:
-                        if not exclude or ip not in exclude: break
+                        if int(str(ip).split('.')[3]) and (not exclude or ip not in exclude): break
+                        
                 else:
                     ip = ipaddress.ip_network(self.random_ip())
                     while ip in exclude: ipaddress.ip_network(self.random_ip())
                 ip = str(ip)
 
             elif ip.find('/') + 1:
-                ip = str(random.choice(list(ipaddress.ip_network(ip))))
+                ip = str(random.choice(self.ip_slash(ip)))
 
         return self.ip2byte(ip)
 
+
+    def ip_slash(self, ip):
+        return list(ipaddress.ip_network(ip))
 
     def random_ip(self):
         return '.'.join([ str(random.randint(0,255)) for _ in range(4) ])
@@ -89,10 +88,9 @@ class PCAP:
     def gen_port(self, port):
         if (port == "any"): port = random.randint(1024,65535)
         else:
-            port = port.replace("$HTTP_PORTS", '80')
-            port = port.replace("$ORACLE_PORTS", '80')
-            port = port.replace("$SHELLCODE_PORTS", '80')
-            port = port.replace("$SSH_PORTS", '80')
+            while (port.find('$') + 1):
+                for pt in list(self.port):
+                    port = port.replace(f'${pt}', str(self.port[pt]))
 
             include, exclude = [], []
             delimiter_braket = port.find('[')

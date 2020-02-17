@@ -1,5 +1,5 @@
-from PCAP import *
-from OPTION import *
+from builder.PCAP import *
+from builder.OPTION import *
 
 import re
 import os

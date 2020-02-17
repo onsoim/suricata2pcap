@@ -33,12 +33,23 @@ class PCAP:
         self.flow       = []
 
 
+    # generate IP
     def gen_ip(self, ip):
         if (ip == "any"): ip = self.random_ip()
         else:
+            flag_dollar = 0
             while (ip.find('$') + 1):
+                flag_dollar = 1
                 for ad in list(self.address):
                     ip = ip.replace(f'${ad}', self.address[ad])
+
+            flag_not = 0
+            if flag_dollar:
+                if ip[0] == '!':
+                    flag_not = 1
+                    ip = ip[1:]
+                if ip.count('[') > 1: ip = ip.split(']')[0][1:] + ']'
+                if flag_not: ip = '!' + ip
 
             if ip[0] == '!':
                 ip = ip[1:]
@@ -71,20 +82,25 @@ class PCAP:
         return self.ip2byte(ip)
 
 
+    # generate all of IP list from subnet mask
     def ip_slash(self, ip):
         return list(ipaddress.ip_network(ip))
 
+    # generate random IP
     def random_ip(self):
         return '.'.join([ str(random.randint(0,255)) for _ in range(4) ])
 
+    # convert IP from decimal to hexadecimal 
     def ip2byte(self, ip):
         return b''.join([ bytes([int(i)]) for i in ip.split('.') ])
 
+    # append two generator
     def add_generator(self, i, j):
         for x in i: yield x
         for x in j: yield x
 
 
+    # generate port
     def gen_port(self, port):
         if (port == "any"): port = random.randint(1024,65535)
         else:
@@ -124,6 +140,7 @@ class PCAP:
         return int(port)
     
 
+    # generate port from given range
     def port_colon(self, value):
         delimiter_colon = value.find(':')
         if delimiter_colon + 1 == len(value): value += "65535"
@@ -132,6 +149,7 @@ class PCAP:
         return list(range(a, b))
 
 
+    # generate header for pcap file
     def golbal_header(self):
         return \
             b'\xd4\xc3\xb2\xa1' + \
@@ -143,6 +161,7 @@ class PCAP:
             b'\x01\x00\x00\x00'
 
 
+    # generate pcap from parsed informations
     def build(self):
         filename = f'pcaps/{self.sid}.pcap'
         try:

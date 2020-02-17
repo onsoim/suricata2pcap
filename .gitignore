@@ -2,10 +2,13 @@
 *.pyc
 *.swp
 
-# for check status
-output.txt
+# input files for test
 full_ruleset.rules
 test*
+*.yaml
+
+# output files for test
+output.txt
 *.pcap
 pcaps*
-*.yaml
+*.json

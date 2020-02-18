@@ -3,12 +3,12 @@
 *.swp
 
 # input files for test
-full_ruleset.rules
+*.rules
 test*
 *.yaml
 
 # output files for test
-output.txt
+*.txt
 *.pcap
 pcaps*
 *.json

@@ -24,7 +24,7 @@ class HTTP(TCP):
         self.http_raw_header        = []
         self.http_raw_uri           = []
 
-        # todo : have to parsing value from above variables
+        # parsing value from above variables
         self.http_method            = []
         self.http_uri               = []
         self.http_version           = []
@@ -40,7 +40,7 @@ class HTTP(TCP):
         self.method            = b'GET'
         self.uri               = b'/'
         self.version           = b'HTTP/1.1'
-        self.host              = b'Host: www.google.com'
+        self.host              = b'Host: www.onsoim.com'
         self.connection        = b'Connection: keep-alive'
         self.upgrade_insecure_requests = b'Upgrade-Insecure-Requests: 1'
         self.user_agent        = b'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3945.130 Safari/537.36'
@@ -57,7 +57,19 @@ class HTTP(TCP):
     def build_http(self):
         ''' build http's data '''
 
+        # stage 1: http_* -> http_{var}
+        for var in (list(self.__dict__)[9:17]):
+            self.__dict__[var] = [ v for v in self.__dict__[var] if v ]
+            for v in self.__dict__[var]:
+                print(v, len(v))
+                # onsoim: workon
         # for h in self.http_header: self.__dict__[h[:h.decode().find(':')].decode().lower().replace('-', '_')] = h
+        print()
+
+        # stage 2: http_{var} -> {var}
+        for var in list(self.__dict__)[17:27]:
+            if 'http' in var and len(self.__dict__[var]):
+                self.__dict__[var[5:]] = b'-'.join([ v.capitalize().encode() for v in var[5:].split('_') ]) + b': ' + b''.join(self.__dict__[var])
 
         self.content = b' '.join([self.method, self.uri, self.version]) + b'\r\n' + \
             self.host + b'\r\n' + \

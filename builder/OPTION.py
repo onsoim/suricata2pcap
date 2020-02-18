@@ -15,10 +15,8 @@ def findall(str, sub):
 
 class OPTION:
     def content(value):
-        flag = False
-        if value[0] == '!':
-            value = value[1:]
-            flag = True
+        if value[0] == '!': return {'content': b''}
+
         value = value.strip('"')
         delimiter_bar = findall(value, '|')
         c = b''
@@ -34,7 +32,7 @@ class OPTION:
                 except:
                     if delimiter_bar[i+1] < len(value) - 1:
                         c += bytes(value[delimiter_bar[i+1] + 1 : len(value)], "utf-8")
-        if flag: c = c[::-1]
+        # if flag: c = c[::-1]
         # print(f'content "{value}" -> {c}')
         return {'content': c}
 
@@ -154,10 +152,6 @@ class OPTION:
 
     def file_data():
         # print("file_data")
-        pass
-
-    def http_server_body():
-        # print("http_server_body")
         pass
 
     def rawbytes():

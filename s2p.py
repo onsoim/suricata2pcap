@@ -11,6 +11,7 @@ def main():
     address, port = groups['address-groups'], groups['port-groups']
 
     # with open('rules/full_ruleset.rules', 'r') as r:
+    # with open('rules/exclude.rules', 'r') as r:
     with open('rules/test.rules', 'r') as r:
         rules = r.read().splitlines()
 

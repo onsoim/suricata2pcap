@@ -50,11 +50,12 @@ class HTTP(TCP):
 
         self.seq = 0
         self.ack = 0
-        
+        self.checksum = b'\x00\x00'
+
         # print(self.__dict__)
 
     
-    def build_http(self):
+    def build_content(self):
         ''' build http's data '''
 
         # stage 1: http_* -> http_{var}
@@ -81,32 +82,3 @@ class HTTP(TCP):
             self.accept_language + b'\r\n' + \
             b'\r\n'
         self.c_length = len(self.content)
-
-
-    def build(self):
-        ''' build http's header and data '''
-
-        # build http's data from variables related to http
-        self.build_http()
-
-        # build packet header
-        c = self.packet_header(c_length = self.c_length)
-
-        # build layer 2 (Ethernet)
-        c += self.dst_mac + self.src_mac + b'\x08\x00'
-
-        # build layer 3 (IP)
-        c += b'\x45\x00' + (44 + self.c_length).to_bytes(2, 'big') + b'\x00\x01\x40\x00\x40\x06\xb6\xb2' + self.src_ip + self.dst_ip
-
-        # build layer 4 (TCP)
-        c += self.src_port.to_bytes(2, 'big') + \
-            self.dst_port.to_bytes(2, 'big') + \
-            self.seq.to_bytes(4, 'big') + \
-            self.ack.to_bytes(4, 'big') + \
-            b'\x60\x18' + \
-            self.c_length.to_bytes(2, 'big') + \
-            b'\x00\x00' + b'\x00\x00' + b'\x02\x04' + \
-            self.c_length.to_bytes(2, 'big')
-        self.seq += self.c_length
-        
-        return self.handshake_3() + c + self.content + self.handshake_4()

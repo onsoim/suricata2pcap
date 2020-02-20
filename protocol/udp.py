@@ -12,11 +12,15 @@ class UDP(PROTOCOL):
         self.content    = []
         self.c_length   = 0
 
+        self.checksum = b'\x00\x00'
+
         # print(self.__dict__)
 
 
     def build(self, proto = 17):
         ''' build udp's header and data '''
+
+        self.build_content()
 
         # build packet header
         c = self.packet_header(b_length = 42, c_length = self.c_length)
@@ -25,12 +29,19 @@ class UDP(PROTOCOL):
         c += self.dst_mac + self.src_mac + b'\x08\x00'
 
         # build layer 3 (IP)
-        c += b'\x45\x00' + (28 + self.c_length).to_bytes(2, 'big') + b'\x00\x01\x40\x00\x40' + bytes([proto]) + b'\xb6\xb2' + self.src_ip + self.dst_ip
+        c += self.calc_checksum(b'\x45\x00' + (28 + self.c_length).to_bytes(2, 'big') + b'\x00\x01\x40\x00\x40' + bytes([proto]) + self.checksum + self.src_ip + self.dst_ip)
 
         # build layer 4 (UDP)
-        c += self.src_port.to_bytes(2, 'big') + \
+        c += self.calc_checksum(
+            self.src_ip + self.dst_ip + b'\x00' + bytes([proto]) + (8 + self.c_length).to_bytes(2, 'big'),
+            self.src_port.to_bytes(2, 'big') + \
             self.dst_port.to_bytes(2, 'big') + \
             (8 + self.c_length).to_bytes(2, 'big') + \
-            b'\x00\x00'
+            b'\x00\x00' + \
+            self.content,
+            6
+        )
 
-        return c + b''.join(self.content)
+        return c
+
+

@@ -24,7 +24,7 @@ class TCP(PROTOCOL):
     def handshake_3(self):
         c = self.packet_header()
         c += self.dst_mac + self.src_mac + b'\x08\x00'
-        c += self.ip_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.src_ip + self.dst_ip)
+        c += self.calc_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.src_ip + self.dst_ip)
         c += self.tcp_checksum(
             self.src_ip + self.dst_ip + b'\x00\x06' + (24).to_bytes(2, 'big'),
             self.src_port.to_bytes(2, 'big') + \
@@ -39,10 +39,10 @@ class TCP(PROTOCOL):
         self.seq += 1
         c += self.packet_header()
         c += self.src_mac + self.dst_mac + b'\x08\x00'
-        c += self.ip_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.dst_ip + self.src_ip)
+        c += self.calc_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.dst_ip + self.src_ip)
         c += self.tcp_checksum(
             self.src_ip + self.dst_ip + b'\x00\x06' + (24).to_bytes(2, 'big'),
-            self.src_port.to_bytes(2, 'big') + \
+            self.dst_port.to_bytes(2, 'big') + \
             self.src_port.to_bytes(2, 'big') + \
             self.ack.to_bytes(4, 'big') + \
             self.seq.to_bytes(4, 'big') + \
@@ -54,7 +54,7 @@ class TCP(PROTOCOL):
         self.ack += 1
         c += self.packet_header()
         c += self.dst_mac + self.src_mac + b'\x08\x00'
-        c += self.ip_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.src_ip + self.dst_ip)
+        c += self.calc_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.src_ip + self.dst_ip)
         c += self.tcp_checksum(
             self.src_ip + self.dst_ip + b'\x00\x06' + (24).to_bytes(2, 'big'),
             self.src_port.to_bytes(2, 'big') + \
@@ -83,10 +83,10 @@ class TCP(PROTOCOL):
         c += self.dst_mac + self.src_mac + b'\x08\x00'
 
         # build layer 3 (IP)
-        c += self.ip_checksum(b'\x45\x00' + (44 + self.c_length).to_bytes(2, 'big') + b'\x00\x01\x40\x00\x40' + bytes([proto]) + self.checksum + self.src_ip + self.dst_ip)
+        c += self.calc_checksum(b'\x45\x00' + (44 + self.c_length).to_bytes(2, 'big') + b'\x00\x01\x40\x00\x40' + bytes([proto]) + self.checksum + self.src_ip + self.dst_ip)
 
         # build layer 4 (TCP)
-        c += self.tcp_checksum(
+        c += self.calc_checksum(
             self.src_ip + self.dst_ip + b'\x00\x06' + (24 + self.c_length).to_bytes(2, 'big'),
             self.src_port.to_bytes(2, 'big') + \
             self.dst_port.to_bytes(2, 'big') + \
@@ -96,7 +96,8 @@ class TCP(PROTOCOL):
             self.c_length.to_bytes(2, 'big') + \
             self.checksum + b'\x00\x00' + b'\x02\x04' + \
             self.c_length.to_bytes(2, 'big') + \
-            self.content
+            self.content,
+            16
         )
         self.seq += self.c_length
 
@@ -109,10 +110,10 @@ class TCP(PROTOCOL):
     def handshake_4(self):
         c = self.packet_header()
         c += self.src_mac + self.dst_mac + b'\x08\x00'
-        c += self.ip_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.dst_ip + self.src_ip)
+        c += self.calc_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.dst_ip + self.src_ip)
         c += self.tcp_checksum(
             self.src_ip + self.dst_ip + b'\x00\x06' + (24).to_bytes(2, 'big'),
-            self.src_port.to_bytes(2, 'big') + \
+            self.dst_port.to_bytes(2, 'big') + \
             self.src_port.to_bytes(2, 'big') + \
             self.ack.to_bytes(4, 'big') + \
             self.seq.to_bytes(4, 'big') + \
@@ -123,7 +124,7 @@ class TCP(PROTOCOL):
 
         c += self.packet_header()
         c += self.dst_mac + self.src_mac + b'\x08\x00'
-        c += self.ip_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.src_ip + self.dst_ip)
+        c += self.calc_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.src_ip + self.dst_ip)
         c += self.tcp_checksum(
             self.src_ip + self.dst_ip + b'\x00\x06' + (24).to_bytes(2, 'big'),
             self.src_port.to_bytes(2, 'big') + \
@@ -138,10 +139,10 @@ class TCP(PROTOCOL):
         self.seq += 1
         c += self.packet_header()
         c += self.src_mac + self.dst_mac + b'\x08\x00'
-        c += self.ip_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.dst_ip + self.src_ip)
+        c += self.calc_checksum(b'\x45\x00\x00\x2c\x00\x01\x00\x00\x40\x06' + self.checksum + self.dst_ip + self.src_ip)
         c += self.tcp_checksum(
             self.src_ip + self.dst_ip + b'\x00\x06' + (24).to_bytes(2, 'big'),
-            self.src_port.to_bytes(2, 'big') + \
+            self.dst_port.to_bytes(2, 'big') + \
             self.src_port.to_bytes(2, 'big') + \
             self.ack.to_bytes(4, 'big') + \
             self.seq.to_bytes(4, 'big') + \
@@ -151,11 +152,6 @@ class TCP(PROTOCOL):
         )
 
         return c
-
-
-    def build_content(self):
-        self.content = b''.join(self.content)
-        self.c_length = len(self.content)
 
 
     def tcp_checksum(self, pseudo_header, tcp_segment):

@@ -54,7 +54,6 @@ class OPTION:
     def isdataat(value):    return {'isdataat': [ v.strip() for v in value.split(',') ]}
     def itype(value):       return {'itype': int(value.strip())}
     def flow(value):        return {'flow': [ v.strip() for v in value.split(',') ]}
-    def within(value):      return {'within': value.strip()}
     def offset(value):      return {'offset': value.strip()}
     def sid(value):         return {'sid': value.strip()}
 
@@ -64,6 +63,7 @@ class OPTION:
     def reference(value):   pass
     def rev(value):         pass
     def threshold(value):   pass
+    def within(value):      pass
 
 
     def flowbits(value):

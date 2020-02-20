@@ -81,7 +81,6 @@ class PCAP:
 
         return self.ip2byte(ip)
 
-
     # generate all of IP list from subnet mask
     def ip_slash(self, ip):
         return list(ipaddress.ip_network(ip))
@@ -96,8 +95,9 @@ class PCAP:
 
     # append two generator
     def add_generator(self, i, j):
-        for x in i: yield x
         for x in j: yield x
+        for x in i: yield x
+
 
 
     # generate port
@@ -139,7 +139,6 @@ class PCAP:
 
         return int(port)
     
-
     # generate port from given range
     def port_colon(self, value):
         delimiter_colon = value.find(':')

@@ -27,8 +27,16 @@ class PROTOCOL:
             (b_length + c_length).to_bytes(4, 'little')
 
 
-    def ip_checksum(self, header):
-        sum = 0
-        for x in struct.iter_unpack('!H', header): sum += x[0]
+    def build_content(self):
+        self.content = b''.join(self.content)
+        self.c_length = len(self.content)
 
-        return header[:-10] + (((sum >> 16) + (sum & 0xffff)) ^ 0xffff).to_bytes(2,'big') + header[-8:]
+
+    def calc_checksum(self, header, segment = b'', offset = -10):
+        sum, padding = 0, b''
+
+        if len(segment) % 2: padding = b'\x00'
+        for x in struct.iter_unpack('!H', header + segment + padding): sum += x[0]
+        if not len(segment): segment = header
+
+        return segment[:offset] + (((sum >> 16) + (sum & 0xffff)) ^ 0xffff).to_bytes(2, 'big') + segment[offset + 2:]

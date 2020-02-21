@@ -18,40 +18,40 @@ class ICMP(PROTOCOL):
         # print(self.__dict__)
 
 
-    def build(self, content = b''):
+    def build(self):
         ''' build icmp's header and data '''
 
+        self.build_content()
+
+        c = self.packet_header(b_length = 42, c_length = len(self.content))
+
         # build layer 2 (Ethernet)
-        self.ethernet_frame = \
+        c += \
             self.dst_mac + \
             self.src_mac + \
             b'\x08\x00'
 
         # build layer 3 (IP)
-        self.ip_frame = \
-            b'\x45' + \
-            b'\x00' + \
-            b'\x00\x9c' + \
+        c += self.calc_checksum(
+            b'\x45\x00' + \
+            (28 + self.c_length).to_bytes(2, 'big') + \
             b'\x00\x00' + \
             b'\x00\x00' + \
-            b'\x2b' + \
-            b'\x01' + \
-            b'\x22\x03' + \
+            b'\x80\x01' + \
+            b'\x00\x00' + \
             self.src_ip + \
             self.dst_ip
+        )
 
-        self.content = b''.join(self.content)
-
-        # build layer 4 (ICMP) and combine with 'packet header', 'ethernet header', 'ip header'
-        self.packet_data = \
-            self.packet_header(b_length = 42, c_length = len(self.content)) + \
-            self.ethernet_frame + \
-            self.ip_frame + \
+        # build layer 4 (ICMP)
+        c += self.calc_checksum(
             bytes([self.itype]) + \
             bytes([self.icode]) + \
             b'\x00\x00' + \
             b'\x00\x00' + \
             b'\x00\x00' + \
-            self.content
+            self.content,
+            offset = 2
+        )
         
-        return self.packet_data
+        return c

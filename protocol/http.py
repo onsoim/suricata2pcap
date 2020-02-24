@@ -61,11 +61,11 @@ class HTTP(TCP):
         # stage 1: http_* -> http_{var}
         for var in (list(self.__dict__)[9:17]):
             self.__dict__[var] = [ v for v in self.__dict__[var] if v ]
-            for v in self.__dict__[var]:
-                print(v, len(v))
-                # onsoim: workon
-        # for h in self.http_header: self.__dict__[h[:h.decode().find(':')].decode().lower().replace('-', '_')] = h
-        print()
+        #     for v in self.__dict__[var]:
+        #         print(v, len(v))
+        #         # onsoim: workon
+        # # for h in self.http_header: self.__dict__[h[:h.decode().find(':')].decode().lower().replace('-', '_')] = h
+        # print()
 
         # stage 2: http_{var} -> {var}
         for var in list(self.__dict__)[17:27]:

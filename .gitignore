@@ -1,6 +1,14 @@
 # cache files
 *.pyc
+*.swp
 
-# for check status
-output.txt
-full_ruleset.rules
+# input files for test
+*.rules
+test*
+*.yaml
+
+# output files for test
+*.txt
+*.pcap
+pcaps*
+*.json

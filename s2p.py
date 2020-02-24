@@ -10,9 +10,9 @@ def main():
     with open('suricata.yaml') as f: groups = yaml.load(f, Loader=yaml.SafeLoader)['vars']
     address, port = groups['address-groups'], groups['port-groups']
 
-    # with open('rules/full_ruleset.rules', 'r') as r:
+    with open('rules/full_ruleset.rules', 'r') as r:
     # with open('rules/exclude.rules', 'r') as r:
-    with open('rules/test.rules', 'r') as r:
+    # with open('rules/test.rules', 'r') as r:
         rules = r.read().splitlines()
 
     # output folder for generated pcaps

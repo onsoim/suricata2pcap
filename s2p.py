@@ -4,16 +4,17 @@ from builder.OPTION import *
 import re
 import os
 import yaml
+import argparse
 
 
-def main():
-    with open('suricata.yaml') as f: groups = yaml.load(f, Loader=yaml.SafeLoader)['vars']
+def build(args):
+    with open(args.config) as f: groups = yaml.load(f, Loader=yaml.SafeLoader)['vars']
     address, port = groups['address-groups'], groups['port-groups']
 
-    with open('rules/full_ruleset.rules', 'r') as r:
-    # with open('rules/exclude.rules', 'r') as r:
-    # with open('rules/test.rules', 'r') as r:
-        rules = r.read().splitlines()
+    rules = []
+    for f in [ f'{args.rules}/{f}' for f in os.listdir(args.rules) if '.rules' in f ] if os.path.isdir(args.rules) else [args.rules]:
+        with open(f, 'r') as r:
+            rules += r.read().splitlines()
 
     # output folder for generated pcaps
     folder = './pcaps'
@@ -111,6 +112,16 @@ def main():
 
         # build a pcap with parsed options
         pcap.build()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(dest='config', help="Suricata config file")
+    parser.add_argument(dest="rules", help='Suricata rule file or folder')
+    args = parser.parse_args()
+
+    build(args)
+
 
 if __name__ == "__main__":    
     main()

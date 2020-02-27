@@ -17,7 +17,7 @@ def build(args):
             rules += r.read().splitlines()
 
     # output folder for generated pcaps
-    folder = './pcaps'
+    folder = args.output
     if not os.path.isdir(folder): os.mkdir(folder)
 
     for rule in rules:
@@ -111,13 +111,14 @@ def build(args):
             except Exception as e: print(f'Unknown Error : {e} / {option} - {rule}')
 
         # build a pcap with parsed options
-        pcap.build()
+        pcap.build(args.output)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument(dest='config', help="Suricata config file")
-    parser.add_argument(dest="rules", help='Suricata rule file or folder')
+    parser.add_argument(dest = "config", help = "Suricata config file")
+    parser.add_argument(dest = "rules", help = 'Suricata rule file or folder')
+    parser.add_argument('-o', '--output', dest = "output", default = 'pcaps', help = 'the name of output folder (defalt: pcaps)')
     args = parser.parse_args()
 
     build(args)

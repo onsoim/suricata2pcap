@@ -163,8 +163,8 @@ class PCAP:
 
 
     # generate pcap from parsed informations
-    def build(self):
-        filename = f'pcaps/{self.sid}.pcap'
+    def build(self, folder):
+        filename = f'{folder}/{self.sid}.pcap'
         try:
             with open(filename, 'wb') as wb:
                 wb.write(self.golbal_header())

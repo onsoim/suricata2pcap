@@ -14,7 +14,12 @@ def build(args):
     rules = []
     for f in [ f'{args.rules}/{f}' for f in os.listdir(args.rules) if '.rules' in f ] if os.path.isdir(args.rules) else [args.rules]:
         with open(f, 'r') as r:
-            rules += r.read().splitlines()
+            rule = True
+            while rule:
+                try:
+                    rule = r.readline()
+                    rules.append(rule)
+                except: pass 
 
     # output folder for generated pcaps
     folder = args.output

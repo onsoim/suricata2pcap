@@ -26,97 +26,99 @@ def build(args):
     if not os.path.isdir(folder): os.mkdir(folder)
 
     for rule in rules:
-        # raw_header stores 'action' and 'header' / raw_options stores all 'option'
-        delimiter_parentheses = rule.find('(')
-        raw_header, raw_options = [x for x in rule[:delimiter_parentheses - 1].split(' ') if x], rule[delimiter_parentheses + 1: -1]
-        if raw_header[1].find('tcp') + 1 and raw_options.find('http_') + 1: raw_header[1] = 'http'
+        try:
+            # raw_header stores 'action' and 'header' / raw_options stores all 'option'
+            delimiter_parentheses = rule.find('(')
+            raw_header, raw_options = [x for x in rule[:delimiter_parentheses - 1].split(' ') if x], rule[delimiter_parentheses + 1: -1]
+            if raw_header[1].find('tcp') + 1 and raw_options.find('http_') + 1: raw_header[1] = 'http'
 
-        # consturct PCAP object with 'rule', 'address info from yaml', 'port info from yaml', 'protocol', 'source ip', 'source port', 'destination ip', 'destination port'
-        pcap = PCAP(rule, address, port, raw_header[1], raw_header[2], raw_header[3], raw_header[5], raw_header[6])
+            # consturct PCAP object with 'rule', 'address info from yaml', 'port info from yaml', 'protocol', 'source ip', 'source port', 'destination ip', 'destination port'
+            pcap = PCAP(rule, address, port, raw_header[1], raw_header[2], raw_header[3], raw_header[5], raw_header[6])
 
-        # extract all options without pcre from a given rule to the list 'options' and add pcre option seperately
-        options = [ option.group(0)[:-1] for option in re.finditer(r'([\w.]{2,})(:("[^"]*"|[^;\\]*))?;', raw_options) ] 
-        escape = raw_options
-        for option in options: escape =  escape.replace(f'{option};', '')
-        if escape.strip() != '': options.append(escape.strip())
+            # extract all options without pcre from a given rule to the list 'options' and add pcre option seperately
+            options = [ option.group(0)[:-1] for option in re.finditer(r'([\w.]{2,})(:("[^"]*"|[^;\\]*))?;', raw_options) ] 
+            escape = raw_options
+            for option in options: escape =  escape.replace(f'{option};', '')
+            if escape.strip() != '': options.append(escape.strip())
 
-        # flag stores a target where to put the content like dns_query
-        flag = 'content'
-        for option in options:
-            try:
-                delimiter_colon = option.find(':')
-                # if the option is consisting of key and value
-                if delimiter_colon + 1:
-                    k, v = option[:delimiter_colon], option[delimiter_colon + 1:]
+            # flag stores a target where to put the content like dns_query
+            flag = 'content'
+            for option in options:
+                try:
+                    delimiter_colon = option.find(':')
+                    # if the option is consisting of key and value
+                    if delimiter_colon + 1:
+                        k, v = option[:delimiter_colon], option[delimiter_colon + 1:]
 
-                    # some key has a dot in its name so replace it to under bar
-                    delimiter_dot = k.find('.')
-                    if delimiter_dot != -1: k = k.replace('.', '_')
+                        # some key has a dot in its name so replace it to under bar
+                        delimiter_dot = k.find('.')
+                        if delimiter_dot != -1: k = k.replace('.', '_')
 
-                    ret = OPTION.__dict__[k](v)
-                    if ret != None:
-                        k, v = list(ret.keys())[0], list(ret.values())[0]
-                        
-                        if k == 'content' or k == 'pcre':
-                            flag = 'content'
-                            pcap.proto.__dict__[flag].append(v)
+                        ret = OPTION.__dict__[k](v)
+                        if ret != None:
+                            k, v = list(ret.keys())[0], list(ret.values())[0]
+                            
+                            if k == 'content' or k == 'pcre':
+                                flag = 'content'
+                                pcap.proto.__dict__[flag].append(v)
 
-                        elif k == 'offset':
-                            c_length = 0
-                            for c in pcap.proto.__dict__[flag][:-1]: c_length += len(c)
-                            c = pcap.proto.__dict__[flag][-1]
-                            pcap.proto.__dict__[flag][-1] = b'A' * (int(v) - c_length) + c
-
-                        elif k == 'depth' or k == 'within':
-                            c = pcap.proto.__dict__[flag][-1]
-                            if v.isdecimal(): pcap.proto.__dict__[flag][-1] = b'A' * (int(v) - len(c)) + c
-                            else: print(v, option, rule)
-
-                        elif k == 'distance':
-                            c = pcap.proto.__dict__[flag][-1]
-                            if v.isdecimal(): pcap.proto.__dict__[flag][-1] = b'A' * int(v) + c
-                            else: print(v, option, rule)
-
-                        elif k == 'isdataat':
-                            if 'relative' in v:
-                                del v[v.index('relative')]
-                                if v[0][0] == '!': v = b'A' * (int(v[0][1:]) - 1)
-                                else: v = b'A' * (int(v[0]))
-                                pcap.proto.__dict__[flag][-1] += v
-                            else:
+                            elif k == 'offset':
                                 c_length = 0
-                                for c in pcap.proto.__dict__[flag]: c_length += len(c)
-                                pcap.proto.__dict__[flag].append(b'A' * (int(v[0]) - c_length))
+                                for c in pcap.proto.__dict__[flag][:-1]: c_length += len(c)
+                                c = pcap.proto.__dict__[flag][-1]
+                                pcap.proto.__dict__[flag][-1] = b'A' * (int(v) - c_length) + c
 
-                        elif k in ['flow', 'icode', 'itype']:
-                            pcap.proto.__dict__[k] = v
+                            elif k == 'depth' or k == 'within':
+                                c = pcap.proto.__dict__[flag][-1]
+                                if v.isdecimal(): pcap.proto.__dict__[flag][-1] = b'A' * (int(v) - len(c)) + c
+                                else: print(v, option, rule)
 
-                        elif k == 'sid':
-                            pcap.sid = v
+                            elif k == 'distance':
+                                c = pcap.proto.__dict__[flag][-1]
+                                if v.isdecimal(): pcap.proto.__dict__[flag][-1] = b'A' * int(v) + c
+                                else: print(v, option, rule)
 
-                        else:
-                            print(k, v)
+                            elif k == 'isdataat':
+                                if 'relative' in v:
+                                    del v[v.index('relative')]
+                                    if v[0][0] == '!': v = b'A' * (int(v[0][1:]) - 1)
+                                    else: v = b'A' * (int(v[0]))
+                                    pcap.proto.__dict__[flag][-1] += v
+                                else:
+                                    c_length = 0
+                                    for c in pcap.proto.__dict__[flag]: c_length += len(c)
+                                    pcap.proto.__dict__[flag].append(b'A' * (int(v[0]) - c_length))
 
-                # if the option is standalone
-                else:
-                    # options related to http
-                    if 'http' in option:
-                        flag = option
-                        pcap.proto.__dict__[flag].append(pcap.proto.content[-1])
-                        del pcap.proto.content[-1]
-                    
-            except KeyError:
-                print(f'Key Error : {option} - {rule}')
+                            elif k in ['flow', 'icode', 'itype']:
+                                pcap.proto.__dict__[k] = v
 
-            except ValueError:
-                print(f'Value Error : {option} - {rule}')
+                            elif k == 'sid':
+                                pcap.sid = v
 
-            except AttributeError: pass
+                            else:
+                                print(k, v)
 
-            except Exception as e: print(f'Unknown Error : {e} / {option} - {rule}')
+                    # if the option is standalone
+                    else:
+                        # options related to http
+                        if 'http' in option:
+                            flag = option
+                            pcap.proto.__dict__[flag].append(pcap.proto.content[-1])
+                            del pcap.proto.content[-1]
+                        
+                except KeyError:
+                    print(f'Key Error : {option} - {rule}')
 
-        # build a pcap with parsed options
-        pcap.build(args.output)
+                except ValueError:
+                    print(f'Value Error : {option} - {rule}')
+
+                except AttributeError: pass
+
+                except Exception as e: print(f'Unknown Error : {e} / {option} - {rule}')
+
+            # build a pcap with parsed options
+            pcap.build(args.output)
+        except: pass
 
 
 def main():
